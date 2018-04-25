@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="debug">
+    <Properties>
+        <Property name="log-path">/home/local/app-log/test</Property>
+        <Property name="log-filename">testingApp</Property>
+    </Properties>
+   <Appenders>
+		<RollingFile name="file-log" fileName="${log-path}/${log-filename}.log" filePattern="${log-path}/${log-filename}-%d{yyyy-MM-dd}-%i.log">
+			<JsonLayout compact="true" properties="true" locationInfo="true" eventEol="true" includeStacktrace="true"/>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="100 MB"/>
+			</Policies>
+		</RollingFile>
+
+		<RollingFile name="file-console" fileName="${log-path}/${log-filename}.console" filePattern="${log-path}/${log-filename}-%d{yyyy-MM-dd}-%i.console">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+    </Appenders>
+
+	<Loggers>
+		<logger name="org.springframework" level="debug" additivity="false">
+			<appender-ref ref="console" level="debug" />
+			<appender-ref ref="file-log" level="debug" />
+			<appender-ref ref="file-console" level="debug" />
+		</logger>
+		<logger name="org.apache" level="error" additivity="false">
+			<appender-ref ref="console" level="error" />
+			<appender-ref ref="file-log" level="error" />
+			<appender-ref ref="file-console" level="error" />
+		</logger>
+		<logger name="org.hibernate" level="info" additivity="false">
+			<appender-ref ref="console" level="info" />
+			<appender-ref ref="file-log" level="info" />
+			<appender-ref ref="file-console" level="info" />
+		</logger>
+		<Root level="trace">
+			<appender-ref ref="console" level="trace" />
+			<appender-ref ref="file-log" level="trace" />
+			<appender-ref ref="file-console" level="trace" />
+		</Root>
+    </Loggers>
+</Configuration>

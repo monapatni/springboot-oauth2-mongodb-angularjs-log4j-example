@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'springboot-oauth2-mongodb-angularjs-log4j-example'
+    version =  '1.0'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.spring.io/milestone"
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile ('org.springframework.boot:spring-boot-starter-data-mongodb') {
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-logging')
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-log4j')
+    }
+
+    compile ('org.springframework.boot:spring-boot-starter-web') {
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-logging')
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-log4j')
+    }
+
+    compile ('org.springframework.boot:spring-boot-starter-security') {
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-logging')
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-log4j')
+    }
+
+    compile ('org.springframework.security.oauth:spring-security-oauth2') {
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-logging')
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-log4j')
+    }
+    compile ('org.springframework.boot:spring-boot-starter-actuator') {
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-logging')
+        exclude( group: 'org.springframework.boot', module: 'spring-boot-starter-log4j')
+    }
+    compile ('org.springframework.boot:spring-boot-starter-log4j2')
+    compile ('org.springframework.security:spring-security-jwt')
+
+    compile ('com.auth0:jwks-rsa:0.3.0')
+}

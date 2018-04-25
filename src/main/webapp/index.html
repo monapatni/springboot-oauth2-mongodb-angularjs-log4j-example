@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <title>User Management</title>
+
+    <style>
+        .action_cls {
+            height: 20px;
+            width: 20px;
+            background-repeat: no-repeat;
+            display: block;
+            padding: 0px 25px;
+            cursor: pointer;
+        }
+        .edit_cls {
+            background-image: url("images/edit.png");
+        }
+        .delete_cls {
+            background-image: url("images/delete.png");
+        }
+    </style>
+
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module('myapp', []);
+
+        app.controller('myappcontroller', function($scope, $http) {
+            $scope.users = []
+            $scope.userform = {
+                id : "",
+                name : "",
+                department : ""
+            };
+
+            getUserDetails();
+            getUserName();
+            function getUserDetails() {
+                $http({
+                    method : 'GET',
+                    url : 'users'
+                }).then(function successCallback(response) {
+                    $scope.users = response.data;
+                }, function errorCallback(response) {
+                    console.log(response.statusText);
+                });
+            }
+
+            function getUserName() {
+                $http({
+                    method : 'GET',
+                    url : 'username',
+                    headers: { 'Accept' : 'text/plain' }
+                }).then(function successCallback(response) {
+                    console.log("Username " + response.data);
+                    document.getElementById("username").innerHTML =  response.data ;
+                });
+            }
+            
+            $scope.processUser = function()
+            {
+                $http({
+                    method : 'POST',
+                    url : 'users',
+                    data : angular.toJson($scope.userform),
+                    beforeSend: function( xhr, settings ) {
+                        var token = $("meta[name='_csrf']").attr("content");
+                        var header = $("meta[name='_csrf_header']").attr("content");
+                        if ( token && header ) {
+                            xhr.setRequestHeader( header, token );
+                        }
+                    },
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    }
+                }).then(clearForm())
+                    .success(function(data){
+                        getUserDetails();
+                    });
+            }
+            $scope.editUser = function(user)
+            {
+                $scope.userform.id = user.id;
+                $scope.userform.name = user.name;
+                $scope.userform.department = user.department;
+                disableName();
+            }
+            $scope.deleteUser = function(user) {
+                $http({
+                    method : 'DELETE',
+                    url : 'users/'+user.id,
+                    data : angular.toJson(user),
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    }
+                }).success(function(data){
+                        getUserDetails();
+                    });
+            }
+
+            function clearForm() {
+                $scope.userform.id = "";
+                $scope.userform.name = "";
+                $scope.userform.department = "";
+                document.getElementById("id").disabled = false;
+            };
+            function disableName()
+            {
+                document.getElementById("id").disabled = true;
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+<body ng-app="myapp" ng-controller="myappcontroller">
+<span id="username"></span>
+<h3>User Form</h3>
+<form name="userForm" ng-submit="processUserDetails(userForm.$valid)">
+    <div class="table-responsive">
+        <table class="table table-bordered" style="width: 600px">
+            <tr>
+                <td>ID</td>
+                <td><input type="text" id="id" ng-model="userform.id" ng-required="true" size="30" /></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" id="name" ng-required="true" ng-model="userform.name" size="30" /></td>
+            </tr>
+            <tr>
+                <td>Department</td>
+                <td><input type="text" id="department" ng-required="true"  ng-model="userform.department"
+                           size="30" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit"
+                                       class="btn btn-primary btn-sm" ng-click="processUser()"
+                                       value="Create / Update User" /></td>
+            </tr>
+        </table>
+    </div>
+</form>
+<h3>Registered Users</h3>
+<div class="table-responsive">
+    <table class="table table-bordered" style="width: 600px">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Actions</th>
+        </tr>
+
+        <tr ng-repeat="user in users">
+            <td>{{ user.id}}</td>
+            <td>{{ user.name}}</td>
+            <td>{{ user.department }}</td>
+            <td style="display: flex;">
+                <span ng-click="editUser(user)" class="action_cls edit_cls"></span>
+                <span ng-click="deleteUser(user)" class="action_cls delete_cls"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
